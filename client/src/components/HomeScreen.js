@@ -2,11 +2,12 @@ import React, { useContext, useEffect } from 'react'
 import { GlobalStoreContext } from '../store'
 import ListCard from './ListCard.js'
 import MUIDeleteModal from './MUIDeleteModal'
-
+import Search from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab'
 import List from '@mui/material/List';
-import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+
 /*
     This React component lists all the top5 lists in the UI.
     
@@ -22,16 +23,43 @@ const HomeScreen = () => {
     function handleCreateNewList() {
         store.createNewList();
     }
+    function handleClickHome(){
+        console.log("Home")
+    }
+    function handleClickAll()
+    {
+        console.log("All")
+    }
+    function handleClickUser()
+    {
+        console.log("user")
+    }
+    function handleSearch()
+    {
+        console.log("Search");
+    }
     let listCard = "";
     if (store) {
+        if (store.currentList != null){
+            store.idNamePairs.forEach((pair) => {
+                if (pair._id == store.currentList._id)
+                {
+                    pair.selected = true;
+                }
+                else
+                {
+                    pair.selected = false;
+                }
+            })
+        }
         listCard = 
-        <List sx={{ width: '90%', left: '5%', bgcolor: 'background.paper', borderRadius: '20px' }}>
+        <List sx={{ width: '100%', mb: '20px' }}>
             {
                 store.idNamePairs.map((pair) => (
                     <ListCard
                         key={pair._id}
                         idNamePair={pair}
-                        selected={false}
+                        selected={pair.selected}
                     />
                 ))
             }
@@ -40,22 +68,39 @@ const HomeScreen = () => {
     return (
         <div id="playlist-selector">
             <div id="list-selector-heading">
-            <Fab 
-                color="primary" 
-                aria-label="add"
-                id="add-list-button"
-                onClick={handleCreateNewList}
-            >
-                <AddIcon />
-            </Fab>
-                <Typography variant="h2">Your Lists</Typography>
+                <div id="list-selector-heading-left">
+
+                    <div id="list-selector-home" onClick={handleClickHome}>
+                    </div>
+                    <div id="list-selector-all" onClick={handleClickAll}>
+                    </div>
+                    <div id="list-selector-user" onClick={handleClickUser}>
+                    </div>
+                </div>
+                <div id="list-selector-heading-center">  
+                    <input placeholder="Search..."></input>
+                    <button onClick={handleSearch}>Search</button>
+                </div>
+                <div id="list-selector-heading-right">
+                    test2
+                </div>  
             </div>
-            <div id="list-selector-list">
+            <Box id="list-selector-list">
                 {
                     listCard
                 }
                 <MUIDeleteModal />
-            </div>
+            </Box>
+
+            <Fab sx={{transform:"translate(-20%, 0%)"}}
+                    color="primary" 
+                    aria-label="add"
+                    id="add-list-button"
+                    onClick={handleCreateNewList}
+                >
+                    <AddIcon />
+            </Fab>
+
         </div>)
 }
 

@@ -5,6 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RedoIcon from '@mui/icons-material/Redo';
 import UndoIcon from '@mui/icons-material/Undo';
 import CloseIcon from '@mui/icons-material/HighlightOff';
+import ArrowUpIcon from '@mui/icons-material/ArrowDropUp';
 
 /*
     This toolbar is a functional React component that
@@ -55,7 +56,7 @@ function EditToolbar() {
                 id='close-button'
                 onClick={handleClose}
                 variant="contained">
-                    <CloseIcon />
+                    <ArrowUpIcon />
             </Button>
         </div>
     )
