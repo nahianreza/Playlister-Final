@@ -61,7 +61,9 @@ deletePlaylist = async (req, res) => {
             User.findOne({ email: list.ownerEmail }, (err, user) => {
                 console.log("user._id: " + user._id);
                 console.log("req.userId: " + req.userId);
-                if (user._id == req.userId) {
+                console.log(list);
+                console.log(list.published);
+                if (user._id == req.userId || list.published) {
                     console.log("correct user!");
                     Playlist.findOneAndDelete({ _id: req.params.id }, () => {
                         return res.status(200).json({
@@ -80,6 +82,49 @@ deletePlaylist = async (req, res) => {
         asyncFindUser(playlist);
     })
 }
+getPublishedPlaylistPairs = async (req, res) => {
+    console.log("get published plyaer list piars : ");
+    if (auth.verifyUser(req) === null) {
+        return res.status(400).json({
+            errorMessage: 'UNAUTHORIZED'
+        })
+    }
+
+    async function findPublishedListPairs(){
+        await Playlist.find({published: true}, (err, playlists) => {
+            if (err) {
+                console.log("ERR: find published list pairs");
+                return res.status(400).json({success: false, error: err});
+            }
+            if (!playlists) {
+                console.log("ERR: no player list found")
+                return res.status(404).json({success: false, error: "playlists not found"})
+            }
+            else {
+                let pairs = [];
+                for (let key in playlists) {
+                    let list = playlists[key]
+                    let pair = {
+                        _id: list._id,
+                        name: list.name,
+                        ownerFirstName: list.ownerFirstName,
+                        ownerLastName: list.ownerLastName,
+                        published: list.published,
+                        publishedDate: list.publishedDate,
+                        likes: list.likes,
+                        dislikes: list.dislikes,
+                        comments: list.comments
+                    };
+                    pairs.push(pair);
+                }
+                console.log(pairs);
+                return res.status(200).json({ success: true, idNamePairs: pairs })
+            }
+        }).catch(err => console.log(err))
+    }
+    findPublishedListPairs();
+}
+
 getPlaylistById = async (req, res) => {
     console.log("Find Playlist with id: " + JSON.stringify(req.params.id));
 
@@ -132,7 +177,14 @@ getPlaylistPairs = async (req, res) => {
                         let list = playlists[key];
                         let pair = {
                             _id: list._id,
-                            name: list.name
+                            name: list.name,
+                            ownerFirstName: list.ownerFirstName,
+                            ownerLastName: list.ownerLastName,
+                            published: list.published,
+                            publishedDate: list.publishedDate,
+                            likes: list.likes,
+                            dislikes: list.dislikes,
+                            comments: list.comments
                         };
                         pairs.push(pair);
                     }
@@ -188,8 +240,12 @@ updatePlaylist = async (req, res) => {
 
                     list.name = body.playlist.name;
                     list.songs = body.playlist.songs;
-                    list
-                        .save()
+                    list.published = body.playlist.published;
+                    list.publishedDate = body.playlist.publishedDate;
+
+                    list.comments = body.playlist.comments;
+
+                    list.save()
                         .then(() => {
                             console.log("SUCCESS!!!");
                             return res.status(200).json({
@@ -220,6 +276,7 @@ module.exports = {
     deletePlaylist,
     getPlaylistById,
     getPlaylistPairs,
+    getPublishedPlaylistPairs,
     getPlaylists,
     updatePlaylist
 }

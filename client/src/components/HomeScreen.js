@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import { GlobalStoreContext } from '../store'
 import ListCard from './ListCard.js'
+import MUIPublishListModal from './MUIPublishListModal'
 import MUIDeleteModal from './MUIDeleteModal'
 import Search from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,6 +10,17 @@ import List from '@mui/material/List';
 import YouTube from 'react-youtube'; 
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box'
+import MUIEditModal from './MUIEditSongModal'
+import MUIRemoveModal from './MUIRemoveSongModal'
+import FastRewindRoundedIcon from '@mui/icons-material/FastRewindRounded';
+import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
+import StopRoundedIcon from '@mui/icons-material/StopRounded';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import IconButton from '@mui/material/IconButton';
+import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import SwitchAccountRoundedIcon from '@mui/icons-material/SwitchAccountRounded';
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 
 /*
     This React component lists all the top5 lists in the UI.
@@ -25,16 +37,16 @@ const HomeScreen = () => {
     function handleCreateNewList() {
         store.createNewList();
     }
-    function handleClickHome(){
-        console.log("Home")
+    function handleHomeClick(){
+        store.showHomeView();
     }
-    function handleClickAll()
+    function handleAllClick()
     {
-        console.log("All")
+        store.showAllUserView();
     }
-    function handleClickUser()
+    function handleUserClick()
     {
-        console.log("user")
+        store.showUserView();
     }
     function handleSearch()
     {
@@ -44,14 +56,8 @@ const HomeScreen = () => {
     if (store) {
         if (store.currentList != null){
             store.idNamePairs.forEach((pair) => {
-                if (pair._id == store.currentList._id)
-                {
-                    pair.selected = true;
-                }
-                else
-                {
-                    pair.selected = false;
-                }
+                if (pair._id == store.currentList._id) pair.selected = true;
+                else pair.selected = false;
             })
         }
         listCard = 
@@ -62,19 +68,21 @@ const HomeScreen = () => {
                         key={pair._id}
                         idNamePair={pair}
                         selected={pair.selected}
+                        published={pair.published}
                     />
                 ))
             }
             </List>;
     }
     let playlist = [
-        "mqmxkGjow1A",
-        "8RbXIMZmVv8",
-        "8UbNbor3OqQ"
     ];
 
+    let youtubeElement = <div></div>
+    let commentsElement = <div></div>
     let currentSong = 0;
 
+
+    
     const playerOptions = {
         height: '390',
         width: '640',
@@ -84,10 +92,68 @@ const HomeScreen = () => {
         },
     };
 
+    if (store.hasSongsInCurrentList())
+    {
+        let songs = store.getCurrentListSongs();
+
+        console.log(songs);
+        playlist = songs.map((song) => (song.youTubeId))
+
+        console.log(playlist);
+        youtubeElement = 
+        <Box>
+                <YouTube
+                    id = "youtube-player"
+                    videoId={playlist[currentSong]}
+                    opts={playerOptions}
+                    onReady={onPlayerReady}
+                    onStateChange={onPlayerStateChange} />;
+                <div id="youtube-player-info">
+
+                </div>
+                <div id="youtube-player-controller">
+                    <Button disabled={store.isCurrentListNull()} onClick={onPlayerClick}>
+                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                            <FastRewindRoundedIcon style={{fontSize:'25pt'}} />
+                        </IconButton>
+                    </Button>
+                    <Button disabled={store.isCurrentListNull()} onClick={onPlayerClick}>
+                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                            <PlayArrowRoundedIcon style={{fontSize:'25pt'}} />
+                        </IconButton>
+                    </Button>
+                    <Button disabled={store.isCurrentListNull()} onClick={onPlayerClick}>
+                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                            <StopRoundedIcon style={{fontSize:'25pt'}} />
+                        </IconButton>
+                    </Button>
+                    <Button disabled={store.isCurrentListNull()} onClick={onPlayerClick}>
+                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                            <FastForwardRoundedIcon style={{fontSize:'25pt'}} />
+                        </IconButton>
+                    </Button>
+                </div>
+            </Box>
+
+
+
+        commentsElement = 
+            <div id="l-comments" className="disabled">
+            </div>
+    }
+
     function loadAndPlayCurrentSong(player) {
         let song = playlist[currentSong];
         player.loadVideoById(song);
         player.playVideo();
+        document.getElementById("youtube-player-info").innerHTML = 
+        `<ul>
+            <li>Playlist: ${store.currentList.name}</li>
+            <li>Songs #: ${store.currentList.songs.length}</li>
+            <li>Title: ${store.currentList.songs[currentSong].title}</li>
+            <li>Artilst: ${store.currentList.songs[currentSong].artist}</li> 
+        </ul>`
+        
     }
 
     function incSong() {
@@ -126,38 +192,50 @@ const HomeScreen = () => {
         }
     }
 
-    function onPlayerClick() {
+    let modalJSX = "";
+    if (store.isEditSongModalOpen()) {
+        modalJSX = <MUIEditModal />;
+    }
+    else if (store.isPublishListModalOpen()) {
+        modalJSX = <MUIPublishListModal />;
+    }
 
+    else if (store.isRemoveSongModalOpen()) {
+        modalJSX = <MUIRemoveModal />;
+    }
+
+
+    function onPlayerClick() {
+        document.getElementById("youtube-player").classList.remove("disabled");
+        document.getElementById("l-comments").classList.add("disabled");
     }
 
     function onCommentsClick() {
-
+        document.getElementById("youtube-player").classList.add("disabled");
+        document.getElementById("l-comments").classList.remove("disabled");
     }
 
-    let youtubeElement = 
-        <YouTube
-            id = "youtube-player"
-            videoId={playlist[currentSong]}
-            opts={playerOptions}
-            onReady={onPlayerReady}
-            onStateChange={onPlayerStateChange} />;
-
-    let commentsElement = 
-        <div id="list-comments">
-        </div>
-    let contentElement = youtubeElement;
 
     return (
         <div id="playlist-selector">
             <div id="list-selector-heading">
                 <div id="list-selector-heading-left">
 
-                    <div id="list-selector-home" onClick={handleClickHome}>
-                    </div>
-                    <div id="list-selector-all" onClick={handleClickAll}>
-                    </div>
-                    <div id="list-selector-user" onClick={handleClickUser}>
-                    </div>
+                    <Box sx={{ p: 1}}>
+                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                            <HomeRoundedIcon style={{fontSize:'25pt'}} />
+                        </IconButton>
+                    </Box>
+                    <Box sx={{ p: 1}}>
+                        <IconButton  onClick={handleAllClick} aria-label='edit'>
+                            <SwitchAccountRoundedIcon style={{fontSize:'25pt'}} />
+                        </IconButton>
+                    </Box>
+                    <Box sx={{ p: 1}}>
+                        <IconButton  onClick={handleUserClick} aria-label='edit'>
+                            <PersonRoundedIcon style={{fontSize:'25pt'}} />
+                        </IconButton>
+                    </Box>
                 </div>
                 <div id="list-selector-heading-center">  
                     <input placeholder="Search..."></input>
@@ -185,16 +263,18 @@ const HomeScreen = () => {
 
             <div id="list-content-box">
                 <div>
-                    <Button disabled={false} id='Player' onClick={onPlayerClick} variant="contained">
+                    <Button disabled={store.isCurrentListNull()} id='list-player-button' onClick={onPlayerClick} variant="contained">
                         Player
                     </Button>
-                    <Button disabled={false} id='Comments' onClick={onCommentsClick} variant="contained">
+                    <Button disabled={store.isCurrentListNull()} id='list-comments-button' onClick={onCommentsClick} variant="contained">
                         Comments
                     </Button>
 
-                    {contentElement}
+                    {youtubeElement}
+                    {commentsElement}
                 </div>
             </div>
+            { modalJSX }
 
         </div>)
 }

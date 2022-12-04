@@ -176,7 +176,15 @@ body {
   height: 50%;
 }
 
-#list-comments {
+#youtube-player.disabled {
+  width: 0%
+}
+
+#list-comments.disabled {
+  width: 0%
+}
+
+#l-comments {
   position: absolute;
   width: 100%;
   height: 80%;
@@ -229,27 +237,32 @@ span {
   background-color: silver;
 }
 
-#list-selector-heading-left #list-selector-home {
-  margin: 1%;
-  width: 20%;
-  height: 80%;
-  background-color: blue;
-}
-#list-selector-heading-left #list-selector-all {
-
-  margin: 1%;
-  width: 20%;
-  height: 80%;
-  background-color: yellow;
-}
-#list-selector-heading-left #list-selector-user {
-
-  margin: 1%;
-  width: 20%;
-  height: 80%;
-  background-color: purple;
+#youtube-player-info {
+  position:absolute;
+  left: 1%;
+  top: 58%;
+  width: 98%;
+  height: 30%;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  border: 1px solid black;
+  background-color: white;
 }
 
+#youtube-player-controller {
+  position:absolute;
+  left: 10%;
+  top: 89%;
+  width: 80%;
+  height: 7%;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-around;
+  border: 1px solid black;
+  background-color: white;
+}
 #list-selector-heading-center{
   flex: 2 1 auto;
   height: 100%;

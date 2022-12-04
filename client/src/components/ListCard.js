@@ -15,6 +15,8 @@ import RedoIcon from '@mui/icons-material/Redo';
 import UndoIcon from '@mui/icons-material/Undo';
 import CloseIcon from '@mui/icons-material/HighlightOff';
 import ArrowUpIcon from '@mui/icons-material/ArrowDropUp';
+import ThumbUpRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
+import ThumbDownRoundedIcon from '@mui/icons-material/ThumbDownAltRounded';
 
 
 
@@ -29,7 +31,7 @@ import ArrowUpIcon from '@mui/icons-material/ArrowDropUp';
 function ListCard(props) {
     const { store } = useContext(GlobalStoreContext);
     const [editActive, setEditActive] = useState(false);
-    const { idNamePair, selected } = props;
+    const { idNamePair, selected, published } = props;
     const [text, setText] = useState(idNamePair.name);
 
     function handleLoadList(event, id) {
@@ -87,10 +89,90 @@ function ListCard(props) {
         store.closeCurrentList();
     }
     function handlePublish() {
-
+        store.showPublishListModal();
     }
     function handleDuplicate() {
 
+    }
+
+    function loadSongs() {
+        return store.currentList.songs.map((song, index) => (
+            <SongCard
+                id={'playlist-song-' + (index)}
+                key={'playlist-song-' + (index)}
+                index={index}
+                song={song}
+                published={published}
+            />
+        ))  
+    }
+
+    function onLikeClick() {
+
+    }
+
+    function onDislikeClick() {
+
+    }
+    let infoBoxElement = 
+        <Box sx={{p: 1, flexGrow: 1}}>
+            <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
+            <Box sx={{ p: 1, flexGrow: 1 }} style={{fontSize: 15}}>By: {idNamePair.ownerFirstName} {idNamePair.ownerLastName}</Box>
+        </Box>
+
+    if (published) {
+        infoBoxElement = 
+        <Box sx={{p: 1, flexGrow: 1}}>
+            <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
+            <Box sx={{ p: 1, flexGrow: 1 }} style={{fontSize: 15}}>By: {idNamePair.ownerFirstName} {idNamePair.ownerLastName}</Box>
+            <Box sx={{ p: 1, flexGrow: 1 }} style={{fontSize: 15}}>Published: {idNamePair.publishedDate}</Box>
+        </Box>
+    }
+
+    let editButtonElement = null
+    let deleteButtonElement = null
+    if (store.isScreenHomeView()) {
+        editButtonElement = 
+            <Box sx={{ p: 1 }}>
+                <IconButton onClick={handleToggleEdit} aria-label='edit'>
+                    <EditIcon style={{fontSize:'20pt'}} />
+                </IconButton>
+            </Box>
+
+        deleteButtonElement = 
+            <Box sx={{ p: 1 }}>
+                <IconButton onClick={(event) => {
+                        handleDeleteList(event, idNamePair._id)
+                    }} aria-label='delete'>
+                    <DeleteIcon style={{fontSize:'20pt'}} />
+                </IconButton>
+            </Box>
+    }
+
+
+    
+
+// LIKES and DISLIKES ELEMENTS
+    let likeButtonAndCount = null
+
+    let dislikeButtonAndCount = null
+
+    if (published) {
+        likeButtonAndCount = 
+            <Box sx={{ p: 1}}>
+                <IconButton onClick={onLikeClick} aria-label='edit'>
+                    <ThumbUpRoundedIcon style={{fontSize:'20pt'}} />
+                </IconButton>
+                {idNamePair.likes}
+            </Box>
+
+        dislikeButtonAndCount = 
+            <Box sx={{ p: 1}}>
+                <IconButton onClick={onDislikeClick} aria-label='edit'>
+                    <ThumbDownRoundedIcon style={{fontSize:'20pt'}} />
+                </IconButton>
+                {idNamePair.dislikes}
+            </Box>
     }
     let editToolbar = 
         <div id="edit-toolbar">
@@ -119,69 +201,59 @@ function ListCard(props) {
         <ListItem
             id={idNamePair._id}
             key={idNamePair._id}
-            sx={{borderRadius:"10px", p: "10px", bgcolor: '#8000F00F', marginTop: '15px', display: 'flex', p: 1 }}
-            style={{transform:"translate(1%,0%)", width: '98%', fontSize: '20pt' }}
+            sx={{borderRadius:"10px", p: "10px", bgcolor: listCardBGColor, marginTop: '15px', display: 'flex', p: 1 }}
+            style={{transform:"translate(1%,0%)", width: '98%', fontSize: '15pt' }}
             button
             onClick={(event) => {
                 handleLoadList(event, idNamePair._id)
             }}
         >
-            <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
-            <Box sx={{ p: 1 }}>
-                <IconButton onClick={handleToggleEdit} aria-label='edit'>
-                    <EditIcon style={{fontSize:'22pt'}} />
-                </IconButton>
-            </Box>
-            <Box sx={{ p: 1 }}>
-                <IconButton onClick={(event) => {
-                        handleDeleteList(event, idNamePair._id)
-                    }} aria-label='delete'>
-                    <DeleteIcon style={{fontSize:'22pt'}} />
-                </IconButton>
-            </Box>
+            {infoBoxElement}
+            {likeButtonAndCount}
+            {dislikeButtonAndCount}
+            {editButtonElement}
+            {deleteButtonElement}  
         </ListItem>
      if (selected && store.currentList != null) {
         cardElement = 
         <ListItem
             id={idNamePair._id}
             key={idNamePair._id}
-            sx={{borderRadius:"10px", p: "10px", bgcolor: '#8000F00F', marginTop: '15px', display: 'flex',  p: 1 }}
+            sx={{borderRadius:"10px", p: "10px", bgcolor: listCardBGColor, marginTop: '15px', display: 'flex',  p: 1 }}
             style={{maxHeight: 500, flexDirection: 'column', transform:"translate(1%,0%)", width: '98%', fontSize: '20pt' }}
             button
         >   
             <Box sx={{display: "flex", p: 1}} style={{flexDirection: 'row', width: '98%',}}>
-                <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
-                <Box sx={{ p: 1}}>
-                    <IconButton onClick={handleToggleEdit} aria-label='edit'>
-                        <EditIcon style={{fontSize:'20pt'}} />
-                    </IconButton>
-                </Box>
-                <Box sx={{ p: 1 }}>
-                    <IconButton onClick={(event) => {
-                            handleDeleteList(event, idNamePair._id)
-                        }} aria-label='delete'>
-                        <DeleteIcon style={{fontSize:'20pt'}} />
-                    </IconButton>
-                </Box>
+                {infoBoxElement}
+                {editButtonElement}
+                {deleteButtonElement}
             </Box>
 
             <List 
                 id="playlist-cards" 
-                sx={{overflow: 'scroll', height: '87%', width: '100%', bgcolor: '#8000F00F'}}
+                sx={{borderRadius: "10px", overflow: 'scroll', height: '87%', width: '100%'}}
             >
-                {
-                    store.currentList.songs.map((song, index) => (
-                        <SongCard
-                            id={'playlist-song-' + (index)}
-                            key={'playlist-song-' + (index)}
-                            index={index}
-                            song={song}
-                        />
-                    ))  
-                }
+               {loadSongs()} 
             </List> 
             {editToolbar}
         </ListItem>
+    }
+    if (published) {
+        editToolbar =
+            <div id="edit-toolbar">
+                        <Button disabled={!store.canClose()} id='close-button' onClick={handleClose} variant="contained">
+                            <ArrowUpIcon />
+                        </Button>
+                        <Button disabled={false} id='duplicate-button' onClick={handleDuplicate} variant="contained">
+                            Duplicate
+                        </Button>
+            </div>
+    }
+
+// LIST CARD BACKGROUND COLOR
+    let listCardBGColor = '#8000F00F';
+    if (published) {
+        listCardBGColor = 'lightblue';
     }
     if (editActive) {
         cardElement =
