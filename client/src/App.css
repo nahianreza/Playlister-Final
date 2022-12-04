@@ -160,6 +160,28 @@ body {
   align-items: center;
   justify-content: center;
 }
+#list-content-box {
+  position:absolute;
+  top: 18%;
+  left: 62%;
+  width: 37%;
+  height: 70%;
+  background-color: rgb(192, 192, 243);
+}
+
+#youtube-player {
+  position: absolute;
+  margin-top: 1%;
+  width: 100%;
+  height: 50%;
+}
+
+#list-comments {
+  position: absolute;
+  width: 100%;
+  height: 80%;
+  background-color: gray;
+}
 
 #add-list-button {
   position: absolute;
@@ -204,7 +226,7 @@ span {
   display: flex;
   justify-content: flex-start;
   height: 100%;
-  background-color: red;
+  background-color: silver;
 }
 
 #list-selector-heading-left #list-selector-home {
@@ -231,12 +253,12 @@ span {
 #list-selector-heading-center{
   flex: 2 1 auto;
   height: 100%;
-  background-color: green;
+  background-color: silver;
 }
 #list-selector-heading-right{
   flex: 1 1 auto;
   height: 100%;
-  background-color: red;
+  background-color: silver;
 }
 .list-card,
 .selected-list-card,
