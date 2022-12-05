@@ -188,7 +188,8 @@ body {
   position: absolute;
   width: 100%;
   height: 80%;
-  background-color: gray;
+  background-color: transparent;
+  
 }
 
 #add-list-button {

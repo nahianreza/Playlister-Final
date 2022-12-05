@@ -17,6 +17,7 @@ import CloseIcon from '@mui/icons-material/HighlightOff';
 import ArrowUpIcon from '@mui/icons-material/ArrowDropUp';
 import ThumbUpRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
 import ThumbDownRoundedIcon from '@mui/icons-material/ThumbDownAltRounded';
+import { lightBlue } from '@mui/material/colors';
 
 
 
@@ -201,7 +202,7 @@ function ListCard(props) {
         <ListItem
             id={idNamePair._id}
             key={idNamePair._id}
-            sx={{borderRadius:"10px", p: "10px", bgcolor: listCardBGColor, marginTop: '15px', display: 'flex', p: 1 }}
+            sx={{borderRadius:"10px", p: "10px", bgcolor: lightBlue, marginTop: '15px', display: 'flex', p: 1 }}
             style={{transform:"translate(1%,0%)", width: '98%', fontSize: '15pt' }}
             button
             onClick={(event) => {
@@ -219,7 +220,7 @@ function ListCard(props) {
         <ListItem
             id={idNamePair._id}
             key={idNamePair._id}
-            sx={{borderRadius:"10px", p: "10px", bgcolor: listCardBGColor, marginTop: '15px', display: 'flex',  p: 1 }}
+            sx={{borderRadius:"10px", p: "10px", bgcolor: 'lightblue', marginTop: '15px', display: 'flex',  p: 1 }}
             style={{maxHeight: 500, flexDirection: 'column', transform:"translate(1%,0%)", width: '98%', fontSize: '20pt' }}
             button
         >   

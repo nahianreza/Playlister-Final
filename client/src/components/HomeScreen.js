@@ -79,6 +79,7 @@ const HomeScreen = () => {
 
     let youtubeElement = <div></div>
     let commentsElement = <div></div>
+    let youtubeEventTarget = null;
     let currentSong = 0;
 
 
@@ -113,22 +114,22 @@ const HomeScreen = () => {
                 </div>
                 <div id="youtube-player-controller">
                     <Button disabled={store.isCurrentListNull()} onClick={onPlayerClick}>
-                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                    <IconButton  onClick={onMoveToFirstSongClick} aria-label='edit'>
                             <FastRewindRoundedIcon style={{fontSize:'25pt'}} />
                         </IconButton>
                     </Button>
                     <Button disabled={store.isCurrentListNull()} onClick={onPlayerClick}>
-                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                    <IconButton  onClick={onPlayerPlayClick} aria-label='edit'>
                             <PlayArrowRoundedIcon style={{fontSize:'25pt'}} />
                         </IconButton>
                     </Button>
                     <Button disabled={store.isCurrentListNull()} onClick={onPlayerClick}>
-                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                    <IconButton  onClick={onPlayerPauseClick} aria-label='edit'>
                             <StopRoundedIcon style={{fontSize:'25pt'}} />
                         </IconButton>
                     </Button>
                     <Button disabled={store.isCurrentListNull()} onClick={onPlayerClick}>
-                        <IconButton  onClick={handleHomeClick} aria-label='edit'>
+                    <IconButton  onClick={onMoveToLastSongClick} aria-label='edit'>
                             <FastForwardRoundedIcon style={{fontSize:'25pt'}} />
                         </IconButton>
                     </Button>
@@ -149,7 +150,7 @@ const HomeScreen = () => {
         document.getElementById("youtube-player-info").innerHTML = 
         `<ul>
             <li>Playlist: ${store.currentList.name}</li>
-            <li>Songs #: ${store.currentList.songs.length}</li>
+            <li>Songs #: ${currentSong + 1}</li>
             <li>Title: ${store.currentList.songs[currentSong].title}</li>
             <li>Artilst: ${store.currentList.songs[currentSong].artist}</li> 
         </ul>`
@@ -164,6 +165,7 @@ const HomeScreen = () => {
     function onPlayerReady(event) {
         loadAndPlayCurrentSong(event.target);
         event.target.playVideo();
+        youtubeEventTarget = event.target;
     }
 
     function onPlayerStateChange(event) {
@@ -213,6 +215,24 @@ const HomeScreen = () => {
     function onCommentsClick() {
         document.getElementById("youtube-player").classList.add("disabled");
         document.getElementById("l-comments").classList.remove("disabled");
+    }
+    function onPlayerPauseClick() {
+        if(youtubeEventTarget){
+            youtubeEventTarget.stopVideo();
+        }
+    }
+    function onPlayerPlayClick() {
+        if (youtubeEventTarget) {
+            youtubeEventTarget.playVideo();
+        }
+    }
+    function onMoveToFirstSongClick(){
+        currentSong = 0;
+        loadAndPlayCurrentSong(youtubeEventTarget);
+    }
+    function onMoveToLastSongClick(){
+        currentSong = store.getCurrentListSongs().length - 1;
+        loadAndPlayCurrentSong(youtubeEventTarget);
     }
 
 
