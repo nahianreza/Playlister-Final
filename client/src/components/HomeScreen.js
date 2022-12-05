@@ -4,6 +4,7 @@ import ListCard from './ListCard.js'
 import MUIPublishListModal from './MUIPublishListModal'
 import MUIDeleteModal from './MUIDeleteModal'
 import Search from '@mui/icons-material/Search';
+import TextField  from '@mui/material/TextField';
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab'
 import List from '@mui/material/List';
@@ -48,9 +49,10 @@ const HomeScreen = () => {
     {
         store.showUserView();
     }
-    function handleSearch()
-    {
-        console.log("Search");
+    const handleOnSearch = (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        store.searchPublishedPlaylist(formData.get('search-playlist'));
     }
     let listCard = "";
     if (store) {
@@ -258,8 +260,15 @@ const HomeScreen = () => {
                     </Box>
                 </div>
                 <div id="list-selector-heading-center">  
-                    <input placeholder="Search..."></input>
-                    <button onClick={handleSearch}>Search</button>
+                <Box
+                        component="form"
+                        sx={{'& > :not(style)': { m: 1, width: '25ch' },}}
+                        noValidate
+                        autoComplete="off"
+                        onSubmit={handleOnSearch}
+                    >
+                        <TextField id="search-playlist" name="search-playlist" label="Search" variant="outlined" />
+                    </Box>
                 </div>
                 <div id="list-selector-heading-right">
                     SORT BY

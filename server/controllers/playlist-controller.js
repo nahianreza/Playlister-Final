@@ -208,6 +208,102 @@ getPlaylists = async (req, res) => {
         return res.status(200).json({ success: true, data: playlists })
     }).catch(err => console.log(err))
 }
+getPublishedPlaylistPairsByTitle = async (req, res) => {
+    console.log("get published plyaer list piars : ");
+    if (auth.verifyUser(req) === null) {
+        return res.status(400).json({
+            errorMessage: 'UNAUTHORIZED'
+        })
+    }
+
+    async function findPublishedListPairsByTitle(title){
+        await Playlist.find({published: true, }, (err, playlists) => {
+            if (err) {
+                console.log("ERR: find published list pairs");
+                return res.status(400).json({success: false, error: err});
+            }
+            if (!playlists) {
+                console.log("ERR: no player list found")
+                return res.status(404).json({success: false, error: "playlists not found"})
+            }
+            else {
+                let pairs = [];
+                let lists = playlists.filter((l) => (l.name.includes(title)))
+                for (let key in lists) {
+                    let list = lists[key]
+                    let pair = {
+                        _id: list._id,
+                        name: list.name,
+                        ownerFirstName: list.ownerFirstName,
+                        ownerLastName: list.ownerLastName,
+                        published: list.published,
+                        publishedDate: list.publishedDate,
+                        likes: list.likes,
+                        dislikes: list.dislikes,
+                        comments: list.comments
+                    };
+                    pairs.push(pair);
+                }
+                console.log(pairs);
+                return res.status(200).json({ success: true, idNamePairs: pairs })
+            }
+        }).catch(err => console.log(err))
+    }
+    findPublishedListPairsByTitle(req.params.title);
+}
+getPublishedPairsByOwnerName = async (req, res) => {
+    console.log("getgetPublishedPairsByOwnerName");
+    if (auth.verifyUser(req) === null) {
+        return res.status(400).json({
+            errorMessage: 'UNAUTHORIZED'
+        })
+    }
+
+    async function findPublishedPairsByOwnerName(name){
+        console.log("server (1)");
+        await Playlist.find({published: true}, (err, playlists) => {
+            if (err) {
+                console.log("ERR: find published list pairs");
+                return res.status(400).json({success: false, error: err});
+            }
+            if (!playlists) {
+                console.log("ERR: no player list found")
+                return res.status(404).json({success: false, error: "playlists not found"})
+            }
+            if (!name) {
+                console.log("ERR: Name not provied")
+                return res.status(404).json({success: false, error: "Name not provided"})
+            }
+            else {
+                const splitName = name.split(" ");
+                let pairs = [];
+                let lists = playlists.filter((l) => (l.ownerFirstName == splitName[0]))
+                if (splitName[1]){
+                    lists = lists.filter((l) => (l.ownerLastName == splitName[1]))
+                }
+                for (let key in lists) {
+                    let list = lists[key]
+                    let pair = {
+                        _id: list._id,
+                        name: list.name,
+                        ownerFirstName: list.ownerFirstName,
+                        ownerLastName: list.ownerLastName,
+                        published: list.published,
+                        publishedDate: list.publishedDate,
+                        likes: list.likes,
+                        dislikes: list.dislikes,
+                        comments: list.comments
+                    };
+                    pairs.push(pair);
+                }
+                console.log(pairs);
+                return res.status(200).json({ success: true, idNamePairs: pairs })
+            }
+        }).catch(err => console.log(err))
+    }
+    findPublishedPairsByOwnerName(req.params.name);
+}
+
 updatePlaylist = async (req, res) => {
     const body = req.body
     console.log("updatePlaylist: " + JSON.stringify(body));
@@ -276,6 +372,8 @@ module.exports = {
     deletePlaylist,
     getPlaylistById,
     getPlaylistPairs,
+    getPublishedPairsByOwnerName,
+    getPublishedPlaylistPairsByTitle,
     getPublishedPlaylistPairs,
     getPlaylists,
     updatePlaylist

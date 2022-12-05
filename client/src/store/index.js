@@ -141,7 +141,7 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     currentModal : CurrentModal.NONE,
                     publishedPairs: store.publishedPairs,
-                    idNamePairs: payload,
+                    idNamePairs: payload.pairs,
                     currentList: null,
                     currentSongIndex: -1,
                     currentSong: null,
@@ -149,7 +149,7 @@ function GlobalStoreContextProvider(props) {
                     listNameActive: false,
                     listIdMarkedForDeletion: null,
                     listMarkedForDeletion: null,
-                    currentHomeState: store.currentHomeState,
+                    currentHomeState: payload.state,
                 });
             }
             case GlobalStoreActionType.LOAD_PUBLISHED_PAIRS: {
@@ -251,8 +251,8 @@ function GlobalStoreContextProvider(props) {
                 return setStore({
                     currentModal : store.currentModal,
                     publishedPairs: store.publishedPairs,
-                    idNamePairs: store.idNamePairs,
-                    currentList: store.currentList,
+                    idNamePairs: [],
+                    currentList: null,
                     currentSongIndex: store.currentSongIndex,
                     currentSong: store.currentSong,
                     newListCounter: store.newListCounter,
@@ -408,7 +408,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.showAllUserView = function() {
-        store.loadPublishedPairs();
+        store.loadPublishedPairs(CurrentHomeState.ALL_USER);
         storeReducer({
             type: GlobalStoreActionType.SHOW_ALL_USER,
             payload: null
@@ -420,6 +420,32 @@ function GlobalStoreContextProvider(props) {
             type: GlobalStoreActionType.SHOW_USER,
             payload: null
         })
+    }
+    store.searchPublishedPlaylist = function(inputString) {
+        console.log("IN0");
+        console.log(store.currentHomeState);
+        if (store.currentHomeState == CurrentHomeState.ALL_USER) {
+            console.log("IN");
+            store.loadPublishedPairsByTitle(inputString);
+        }
+        if (store.currentHomeState == CurrentHomeState.USER) {
+            store.loadPublishedPairsByOwnerName(inputString);
+        }
+    }
+    store.loadPublishedPairsByOwnerName = function (name) {
+        console.log("(1)");
+        console.log(name);
+        async function aysncLoadPublishedPairsByOwnerName() {
+            const response = await api.getPublishedPairsByOwnerName(name);
+            if (response.data.success) {
+                let pairsArray = response.data.idNamePairs;
+                storeReducer({
+                    type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                    payload: {pairs: pairsArray, state: CurrentHomeState.USER}
+                });
+            }
+        } 
+        aysncLoadPublishedPairsByOwnerName();
     }
 
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
@@ -477,11 +503,25 @@ function GlobalStoreContextProvider(props) {
                 console.log(pairsArray);
                 storeReducer({
                     type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
-                    payload: pairsArray
+                    payload: {pairs: pairsArray, state: CurrentHomeState.ALL_USER}
                 });
             }
         }
         asyncLoadPublishedPairs();
+    }
+
+    store.loadPublishedPairsByTitle = function (title) {
+        async function aysncLoadPublishedPairsByTitle() {
+            const response = await api.getPublishedplaylistPairsByTitle(title);
+            if (response.data.success) {
+                let pairsArray = response.data.idNamePairs;
+                storeReducer({
+                    type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                    payload: {pairs: pairsArray, state: CurrentHomeState.ALL_USER}
+                });
+            }
+        }
+        aysncLoadPublishedPairsByTitle();
     }
 
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
@@ -492,7 +532,7 @@ function GlobalStoreContextProvider(props) {
                 let pairsArray = response.data.idNamePairs;
                 storeReducer({
                     type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
-                    payload: pairsArray
+                    payload: {pairs: pairsArray, state: CurrentHomeState.HOME}
                 });
             }
             else {
