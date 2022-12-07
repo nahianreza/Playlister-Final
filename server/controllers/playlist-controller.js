@@ -122,12 +122,12 @@ getPlaylistById = async (req, res) => {
             await User.findOne({ email: list.ownerEmail }, (err, user) => {
                 console.log("user._id: " + user._id);
                 console.log("req.userId: " + req.userId);
-                if (user._id == req.userId) {
+                if (true) {
                     console.log("correct user!");
                     return res.status(200).json({ success: true, playlist: list })
                 }
                 else {
-                    console.log("incorrect user!");
+                    console.log("incorrect user! - getplaylistbyid");
                     return res.status(400).json({ success: false, description: "authentication error" });
                 }
             });
@@ -316,6 +316,7 @@ updatePlaylist = async (req, res) => {
                     list.songs = body.playlist.songs;
                     list.published = body.playlist.published;
                     list.publishedDate = body.playlist.publishedDate;
+                    list.listens = body.playlist.listens;
                     list.likes = body.playlist.likes;
                     list.dislikes = body.playlist.dislikes;
                     list.comments = body.playlist.comments;

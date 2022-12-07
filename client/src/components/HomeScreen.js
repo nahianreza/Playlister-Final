@@ -256,13 +256,13 @@ const HomeScreen = () => {
 
 
     function onPlayerClick() {
-        document.getElementById("youtube-player").classList.remove("disabled");
-        document.getElementById("l-comments").classList.add("disabled");
+        document.getElementById("youtube-player")?.classList.remove("disabled");
+        document.getElementById("l-comments")?.classList.add("disabled");
     }
 
     function onCommentsClick() {
-        document.getElementById("youtube-player").classList.add("disabled");
-        document.getElementById("l-comments").classList.remove("disabled");
+        document.getElementById("youtube-player")?.classList.add("disabled");
+        document.getElementById("l-comments")?.classList.remove("disabled");
     }
     function onPlayerPauseClick() {
         if(youtubeEventTarget){

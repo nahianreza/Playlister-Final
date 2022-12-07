@@ -93,6 +93,7 @@ function ListCard(props) {
         store.showPublishListModal();
     }
     function handleDuplicate() {
+        store.duplicateList(idNamePair)
 
     }
 
@@ -119,29 +120,30 @@ function ListCard(props) {
     }
     let infoBoxElement = 
         <Box sx={{p: 1, flexGrow: 1}}>
-            <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
+             <Box sx={{ p: 1, flexGrow: 1 }} >{idNamePair.name}</Box>
             <Box sx={{ p: 1, flexGrow: 1 }} style={{fontSize: 15}}>By: {idNamePair.ownerFirstName} {idNamePair.ownerLastName}</Box>
         </Box>
 
     if (published) {
         infoBoxElement = 
         <Box sx={{p: 1, flexGrow: 1}}>
-            <Box sx={{ p: 1, flexGrow: 1 }}>{idNamePair.name}</Box>
+            <Box sx={{ p: 1, flexGrow: 1 }} style={{fontSize: 20, fontWeight: 800}}>{idNamePair.name}</Box>
             <Box sx={{ p: 1, flexGrow: 1 }} style={{fontSize: 15}}>By: {idNamePair.ownerFirstName} {idNamePair.ownerLastName}</Box>
-            <Box sx={{ p: 1, flexGrow: 1 }} style={{fontSize: 15}}>Published: {idNamePair.publishedDate}</Box>
+            <Box sx={{ p: 1, flexGrow: 1 }} style={{fontSize: 15, color: "blue"}}>Published: {idNamePair.publishedDate}</Box>
         </Box>
     }
 
     let editButtonElement = null
     let deleteButtonElement = null
-    if (store.isScreenHomeView()) {
+    if (!published) {
         editButtonElement = 
             <Box sx={{ p: 1 }}>
                 <IconButton onClick={handleToggleEdit} aria-label='edit'>
                     <EditIcon style={{fontSize:'20pt'}} />
                 </IconButton>
             </Box>
-
+    }
+    if (store.isScreenHomeView()) {
         deleteButtonElement = 
             <Box sx={{ p: 1 }}>
                 <IconButton onClick={(event) => {
@@ -177,6 +179,11 @@ function ListCard(props) {
                 {idNamePair.dislikes}
             </Box>
     }
+    let listensElement = 
+    <Box sx={{ p: 1}} style={{fontSize: '12pt'}}>
+        listens: {idNamePair.listens}
+    </Box>
+
     let editToolbar = 
         <div id="edit-toolbar">
             <Button disabled={!store.canAddNewSong()} id='add-song-button' onClick={handleAddNewSong} variant="contained">
@@ -214,6 +221,7 @@ function ListCard(props) {
             {infoBoxElement}
             {likeButtonAndCount}
             {dislikeButtonAndCount}
+            {listensElement}
             {editButtonElement}
             {deleteButtonElement}  
         </ListItem>
@@ -231,6 +239,7 @@ function ListCard(props) {
                 {likeButtonAndCount}
                 {dislikeButtonAndCount}
                 {editButtonElement}
+                {listensElement}
                 {deleteButtonElement}
             </Box>
 

@@ -20,6 +20,7 @@ const playlistSchema = new Schema(
         }], required: true },
         published: {type: Boolean, required: true},
         publishedDate: {type: String, required: true},
+        listens: {type: Number, required: true},
         likes: {type: Number, required: true},
         dislikes: {type: Number, required: true},
         comments: { type: [{
