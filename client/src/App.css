@@ -181,7 +181,7 @@ body {
 }
 
 #list-comments.disabled {
-  width: 0%
+  left: -1000%
 }
 
 #l-comments {
@@ -224,6 +224,21 @@ body {
 span {
   font-weight: bolder;
   font-style: italic;
+}
+.comment-card {
+  font-size: 10pt;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: white;
+}
+
+#add-comment-box {
+  position: absolute;
+}
+
+#list-add-comment {
+  border-radius: 5px;
 }
 
  #playlist-selector{

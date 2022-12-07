@@ -3,8 +3,10 @@ import { GlobalStoreContext } from '../store'
 import ListCard from './ListCard.js'
 import MUIPublishListModal from './MUIPublishListModal'
 import MUIDeleteModal from './MUIDeleteModal'
-import Search from '@mui/icons-material/Search';
+import SearchIcon from '@mui/icons-material/Search';
 import TextField  from '@mui/material/TextField';
+import AuthContext from '../auth';
+import CommentCard from './CommentCard.js'
 import AddIcon from '@mui/icons-material/Add';
 import Fab from '@mui/material/Fab'
 import List from '@mui/material/List';
@@ -18,7 +20,9 @@ import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import IconButton from '@mui/material/IconButton';
-import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
+import SortRoundedIcon from '@mui/icons-material/SortRounded';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import SwitchAccountRoundedIcon from '@mui/icons-material/SwitchAccountRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
@@ -30,6 +34,7 @@ import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 */
 const HomeScreen = () => {
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
 
     useEffect(() => {
         store.loadIdNamePairs();
@@ -137,12 +142,42 @@ const HomeScreen = () => {
                     </Button>
                 </div>
             </Box>
-
-
-
+    }
+    if (store.hasSongsInCurrentList() && store.currentList.published)
+    {
         commentsElement = 
             <div id="l-comments" className="disabled">
+                <List sx={{borderRadius: "1px", overflow: 'scroll', height: '80%', width: '100%', mb:"10px" }}>
+                {
+                    store.currentList.comments.map((comment) => (
+                        <CommentCard
+                            writer={comment.name}
+                            content={comment.content}
+                        />
+                    ))                    
+                }
+                </List>
+                <Box
+                    id="add-comment-box"
+                    component="form"
+                    sx={{'& > :not(style)': { m: 1, width: '50ch', height: '4ch'},}}
+                    noValidate
+                    autoComplete="off"
+                    onSubmit={handleOnComment}
+                >
+                    <TextField id="list-add-comment" name="list-add-comment" label="Comment" variant="outlined" />
+                </Box>
             </div>
+    }
+    const handleOnComment = (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        let userName = auth.getUserName();
+        store.addCommentOnPlaylist(userName, formData.get('list-add-comment'))
+        document.getElementById("list-add-comment").value = ""
+    }
+    function handleSortClick() {
+
     }
 
     function loadAndPlayCurrentSong(player) {
@@ -162,6 +197,17 @@ const HomeScreen = () => {
     function incSong() {
         currentSong++;
         currentSong = currentSong % playlist.length;
+    }
+
+    function isCommentsValid() {
+        if (store.currentList)
+        {
+            if (store.currentList.published)
+            {
+                return true
+            }
+        }
+        return false
     }
 
     function onPlayerReady(event) {
@@ -236,6 +282,15 @@ const HomeScreen = () => {
         currentSong = store.getCurrentListSongs().length - 1;
         loadAndPlayCurrentSong(youtubeEventTarget);
     }
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+    setAnchorEl(null);
+    };
+
 
 
     return (
@@ -271,7 +326,33 @@ const HomeScreen = () => {
                     </Box>
                 </div>
                 <div id="list-selector-heading-right">
-                    SORT BY
+                <div>
+                        SORT BY
+                        <IconButton  onClick={handleClick} aria-label='edit'>
+                            <SortRoundedIcon style={{fontSize:'25pt'}} />
+                        </IconButton>
+                        <Menu
+                            id="demo-positioned-menu"
+                            aria-labelledby="demo-positioned-button"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                            }}
+                            transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                            }}
+                        >
+                            <MenuItem onClick={handleClose}>Alphabetical</MenuItem>
+                            <MenuItem onClick={handleClose}>Publish Date</MenuItem>
+                            <MenuItem onClick={handleClose}>Listens</MenuItem>
+                            <MenuItem onClick={handleClose}>Likes</MenuItem>
+                            <MenuItem onClick={handleClose}>Dislikes</MenuItem>
+                        </Menu>
+                    </div>
                 </div>  
             </div>
             <Box id="list-selector-list">
@@ -295,7 +376,7 @@ const HomeScreen = () => {
                     <Button disabled={store.isCurrentListNull()} id='list-player-button' onClick={onPlayerClick} variant="contained">
                         Player
                     </Button>
-                    <Button disabled={store.isCurrentListNull()} id='list-comments-button' onClick={onCommentsClick} variant="contained">
+                    <Button disabled={!isCommentsValid()} id='list-comments-button' onClick={onCommentsClick} variant="contained">
                         Comments
                     </Button>
 

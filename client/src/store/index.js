@@ -495,6 +495,21 @@ function GlobalStoreContextProvider(props) {
         }
         return [];
     }
+    store.addCommentOnPlaylist = function(writer, content) {
+        async function asyncAddCommentOnPlayer() {
+            let comment = {name: writer, content: content}
+            store.currentList.comments.push(comment);
+            let response = await api.addCommentOnList(store.currentList._id, comment)
+            if (response.data.success) {
+                let playlist = response.data.playlist;
+                storeReducer({
+                    type:GlobalStoreActionType.SET_CURRENT_LIST,
+                    payload: store.currentList,
+                });
+            }
+        }
+        asyncAddCommentOnPlayer();
+    }
     store.loadPublishedPairs = function () {
         async function asyncLoadPublishedPairs() {
             const response = await api.getPublishedPlaylistPairs();
@@ -572,6 +587,54 @@ function GlobalStoreContextProvider(props) {
     store.deleteMarkedList = function() {
         store.deleteList(store.listIdMarkedForDeletion);
         store.hideModals();
+    }
+    store.sortPlaylists = function(sortType) {
+
+    }
+
+    store.addLikeToList = function(id) {
+
+        let ind = -1
+        for (let i = 0; i < store.idNamePairs.length; i++) {
+            if (store.idNamePairs[i]._id == id) {
+                ind = i;
+                store.idNamePairs[i].likes += 1;
+                break;
+            }
+        }
+        if (ind != -1) {
+            store.updateList(id, store.idNamePairs[ind]);
+        }
+    }
+
+    store.addDislikeToList = function(id) {
+        let ind = -1
+        for (let i = 0; i < store.idNamePairs.length; i++) {
+            if (store.idNamePairs[i]._id == id) {
+                ind = i;
+                store.idNamePairs[i].dislikes += 1;
+                break;
+            }
+        }
+        if (ind != -1) {
+            store.updateList(id, store.idNamePairs[ind]);
+        }
+    }
+
+    store.updateList = function(id, list) {
+        async function asyncUpdateList() {
+            const response = await api.updatePlaylistById(id, list);
+            if (response.data.success) {
+                storeReducer({
+                    type: GlobalStoreActionType.SET_CURRENT_LIST,
+                    payload: store.currentList
+                });
+            }
+            else {
+                console.log("fail");
+            }
+        }
+        asyncUpdateList();
     }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST

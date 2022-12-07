@@ -55,6 +55,9 @@ function AuthContextProvider(props) {
                 return auth;
         }
     }
+    auth.getUserName = function() {
+        return `${auth.user.firstName} ${auth.user.lastName}`;
+    }
 
     auth.getLoggedIn = async function () {
         const response = await api.getLoggedIn();

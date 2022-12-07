@@ -108,12 +108,14 @@ function ListCard(props) {
         ))  
     }
 
-    function onLikeClick() {
-
+    function onLikeClick(event) {
+        event.stopPropagation();
+        store.addLikeToList(idNamePair._id);
     }
 
-    function onDislikeClick() {
-
+    function onDislikeClick(event) {
+        event.stopPropagation();
+        store.addDislikeToList(idNamePair._id)
     }
     let infoBoxElement = 
         <Box sx={{p: 1, flexGrow: 1}}>
@@ -226,6 +228,8 @@ function ListCard(props) {
         >   
             <Box sx={{display: "flex", p: 1}} style={{flexDirection: 'row', width: '98%',}}>
                 {infoBoxElement}
+                {likeButtonAndCount}
+                {dislikeButtonAndCount}
                 {editButtonElement}
                 {deleteButtonElement}
             </Box>
